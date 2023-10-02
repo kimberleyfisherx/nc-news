@@ -1,6 +1,6 @@
-const { getTopics } = require("../models/models.api"); //imports gettopics which selects topics
+const { getTopics, getApi } = require("../models/models.api"); //imports gettopics which selects topics
 
-exports.fetchTopics = (req, res, next) => {
+exports.fetchTopics = (req, res) => {
   //exports fetchtopics function , funtion takes 2 params request and response
   getTopics()
     .then((result) => {
@@ -9,7 +9,14 @@ exports.fetchTopics = (req, res, next) => {
     })
     .catch((error) => {
       console.log(error);
-      next(error);
+      res.status(500).send({ error: "Error fetching topics" });
     });
 };
 
+//this is the shift manager delegating to models the staff member
+
+exports.fetchApi = (req, res) => {
+  getApi().then((result) => {
+    res.status(200).send({ endPointData: result }); // then sends this infor back to the client as a JSON response.
+  });
+};
