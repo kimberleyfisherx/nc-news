@@ -18,10 +18,11 @@ describe("GET /api/topics", () => {
           // loop  through each topic in the res checks properties named slug and description
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
+          expect(topic).toHaveProperty("slug", expect.any(String));
         });
       });
   });
-  describe("GET /api/topics/invalidendpoint", () => {
+  describe("GET /api/invalidendpoint", () => {
     test("should return a 404 status and the error message", () => {
       return request(app)
         .get("/api/topics/invalidendpoint")

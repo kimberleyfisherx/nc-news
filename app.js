@@ -6,7 +6,7 @@ app.use(express.json()); // app.use handles specific requests - here we are pars
 
 app.get("/api/topics", fetchTopics); // defines a GET route, When a GET request made ,call the fetchTopics function made in controller file
 
-app.get("/*", (req, res) => {
+app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Request not found" });
 }); // error handling, if request is made that doesnt have a path, returns 404 code and msg
 module.exports = app;
