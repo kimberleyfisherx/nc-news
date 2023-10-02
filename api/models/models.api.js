@@ -1,5 +1,4 @@
-const db = require("../db/connection"); //imports db from connection
-const data = require("../db/data/test-data"); //imports data for testing
+const db = require("../../db/connection"); //imports db from connection
 const fs = require("fs/promises");
 
 exports.getTopics = () => {
@@ -16,4 +15,3 @@ exports.getApi = () => {
     return parsedData;
   });
 };
-

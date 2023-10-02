@@ -1,7 +1,7 @@
-const db = require("../db/connection"); //imports db again from connection
-const seed = require("../db/seeds/seed"); //imports seeding
+const db = require("../../db/connection"); //imports db again from connection
+const seed = require("../../db/seeds/seed"); //imports seeding
 const request = require("supertest"); //imports supertest (a library which allows http express requests)
-const data = require("../db/data/test-data/index"); //imports test data
+const data = require("../../db/data/test-data/index"); //imports test data
 const app = require("../app.js"); //imports app has all the application and routes i
 
 beforeEach(() => seed(data)); // sets up function to define what happens before each test, here we populate the database with data before testing
