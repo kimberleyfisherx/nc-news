@@ -1,6 +1,6 @@
 const { getTopics } = require("../models/models.api"); //imports gettopics which selects topics
 
-exports.fetchTopics = (req, res) => {
+exports.fetchTopics = (req, res, next) => {
   //exports fetchtopics function , funtion takes 2 params request and response
   getTopics()
     .then((result) => {
@@ -9,6 +9,6 @@ exports.fetchTopics = (req, res) => {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).send({ error: "Error fetching topics" });
+      next(error);
     });
 };
