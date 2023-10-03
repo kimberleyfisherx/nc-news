@@ -3,14 +3,13 @@ const {
   getApi,
   getArticleId,
   getArticlesInDateOrder,
-} = require("../models/models.api"); //imports gettopics which selects topics
+  getCommentsById,
+} = require("../models/models.api"); 
 
 exports.fetchTopics = (req, res) => {
-  //exports fetchtopics function , funtion takes 2 params request and response
   getTopics()
     .then((result) => {
-      //retrieves topics //.then is promise handler
-      res.status(200).send({ topics: result }); //when promise returned by gettopics, response is to  send object of topics to the client
+      res.status(200).send({ topics: result }); 
     })
     .catch((error) => {
       console.log(error);
@@ -18,11 +17,9 @@ exports.fetchTopics = (req, res) => {
     });
 };
 
-//this is the shift manager delegating to models the staff member
-
 exports.fetchApi = (req, res) => {
   getApi().then((result) => {
-    res.status(200).send({ endPointData: result }); // then sends this infor back to the client as a JSON response.
+    res.status(200).send({ endPointData: result }); 
   });
 };
 
@@ -35,8 +32,22 @@ exports.fetchArticleId = (req, res, next) => {
     .catch(next);
 };
 
-exports.fetchArticles = (req, res) => {
-  getArticlesInDateOrder().then((result) => {
-    res.status(200).send({ articles: result });
-  });
+exports.fetchArticles = (req, res, next) => {
+  getArticlesInDateOrder()
+    .then((result) => {
+      res.status(200).send({ articles: result });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ error: "Error fetching articles" });
+    });
+};
+
+exports.fetchCommentsById = (req, res, next) => {
+  const articleIdQuery = req.params;
+  getCommentsById(articleIdQuery)
+    .then((result) => {
+      res.status(200).send({ comments: result });
+    })
+    .catch(next);
 };

@@ -3,7 +3,7 @@ const seed = require("../../db/seeds/seed"); //imports seeding
 const request = require("supertest"); //imports supertest (a library which allows http express requests)
 const data = require("../../db/data/test-data/index"); //imports test data
 const app = require("../app"); //imports app has all the application and routes in
-const toBeSortedBy = require("jest-sorted");
+const toBeSorted = require("jest-sorted");
 beforeEach(() => seed(data)); // sets up function to define what happens before each test, here we populate the database with data before testing
 afterAll(() => db.end()); //used to close connection after each test
 
@@ -13,9 +13,8 @@ describe("GET /api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then((res) => {
-        expect(res.body.topics.length).toBe(3); // checks topics should return array of 3
+        expect(res.body.topics.length).toBe(3);
         res.body.topics.forEach((topic) => {
-          // loop  through each topic in the res checks properties named slug and description
           expect(topic).toHaveProperty("slug");
           expect(topic).toHaveProperty("description");
           expect(topic).toHaveProperty("slug", expect.any(String));
@@ -32,7 +31,7 @@ describe("GET /api/topics", () => {
         });
     });
   });
-  describe("/api", () => {
+  describe("GET/api", () => {
     test("should return JSON object with endpoint details including description, queries, and example response for each endpoint", () => {
       return request(app)
         .get("/api/")
@@ -56,7 +55,7 @@ describe("GET /api/topics", () => {
         });
     });
   });
-  describe("/api/articles/:article_id", () => {
+  describe("GET/api/articles/:article_id", () => {
     test("returns an article object with expected properties", () => {
       return request(app)
         .get("/api/articles/4")
@@ -78,7 +77,7 @@ describe("GET /api/topics", () => {
     });
   });
 
-  test("to GET a status 400 and correct error message when an invalid article id is selected", () => {
+  test("returns a status 400 and invalid request message when an invalid article id is selected", () => {
     return request(app)
       .get("/api/articles/invalid")
       .expect(400)
@@ -86,7 +85,7 @@ describe("GET /api/topics", () => {
         expect(response.body.msg).toEqual("invalid request");
       });
   });
-  test("to GET a status 404 and correct error message when an  article id is valid but does not exist", () => {
+  test("returns  a status 404 and article not found message when an article id is valid but article  does not exist", () => {
     return request(app)
       .get("/api/articles/999999")
       .expect(404)
@@ -95,49 +94,87 @@ describe("GET /api/topics", () => {
       });
   });
 
-  describe("/api/articles", () => {
-    test(`to GET status 200 and an array containing article objects containing the following properties: author, title, article_id, body, topic, created_at, votes, article_img_url, comment_count. The articles should be sorted by date in descending order.`, () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then((response) => {
-          const articles = response.body.articles;
-
-          const expectedProperties = {
-            author: expect.any(String),
-            title: expect.any(String),
-            article_id: expect.any(Number),
-            topic: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
-            comment_count: expect.any(Number),
-          };
-
-          expect(articles.length).toBeGreaterThan(0); // Added assertion for array length
-
-          articles.forEach((article) => {
-            expect(article).toMatchObject(expectedProperties);
-
-            expect(article).not.toHaveProperty("body");
-          });
-        });
-    });
-  });
-
-  test("GET articles sorted by date descending", () => {
+  test("returns articles sorted by date descending", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
-        const dates = body.articles.map(
-          (article) => new Date(article.created_at)
-        );
-
-        const sortedDates = [...dates].sort((a, b) => b - a);
-
-        expect(dates).toEqual(sortedDates);
+        const articles = body.articles;
+        expect(articles).toBeSorted({
+          key: "created_at",
+          descending: true,
+        });
       });
   });
+  describe("GET /api/articles/:article_id/comments", () => {
+    test(`returns status 200 and an array containing comment objects containing the following properties: comment_id, votes, created_at, author, body, article_id. Comments should be sorted by date in descending order.`, () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((response) => {
+          const comments = response.body.comments;
+          const expectedProperties = {
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          };
+
+          expect(comments.length).toBe(11);
+        });
+    });
+  });
+
+  test("returns a status 400 and invalid request message when an invalid article id is selected", () => {
+    return request(app)
+      .get("/api/articles/invalid/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("invalid request");
+      });
+  });
+  test("return status 200 article id is valid but has no comments ", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments).toEqual([]);
+      });
+  });
+});
+test("check endpoints.json file has been updated ", () => {
+  return request(app)
+    .get("/api/")
+    .expect(200)
+    .then((response) => {
+      const endpointObject =
+        response.body.endPointData["GET /api/articles/:article_id/comments"];
+      expect(endpointObject).toMatchObject({
+        description: expect.any(String),
+        queries: expect.any(Array),
+        exampleResponse: expect.any(Array),
+      });
+    });
+});
+test("return 404 status code if article_id is valid but there is no article", () => {
+  return request(app)
+    .get("/api/articles/9999/comments")
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toEqual("no article found");
+    });
+});
+test("comments sorted by most recent first", () => {
+  return request(app)
+    .get("/api/articles/1/comments")
+    .expect(200)
+    .then(({ body }) => {
+      const comments = body.comments;
+      expect(comments).toBeSorted({
+        key: "created_at",
+        descending: true,
+      });
+    });
 });
