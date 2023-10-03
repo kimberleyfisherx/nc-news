@@ -53,14 +53,16 @@ exports.getCommentsByIdQuery = `SELECT * FROM comments WHERE article_id = $1 ORD
 exports.getCommentsById = (id) => {
   const articleIdNum = id.article_id;
   return db
-    .query(exports.getArticleByIdQuery, [articleIdNum])
+    .query(exports.getArticleByIdQuery, [articleIdNum]) //Query to get article information based on articleIdNum.
     .then((result) => {
+      // Handle the result of the first query.
       if (result.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "no article found" });
-      } else return db.query(exports.getCommentsByIdQuery, [articleIdNum]);
+        // Check if there are no rows returned.
+        return Promise.reject({ status: 404, msg: "no article found" }); // If no rows, reject the promise with a 404 status and an error message.
+      } else return db.query(exports.getCommentsByIdQuery, [articleIdNum]); // If there are rows, query for comments based on articleIdNum.
     })
     .then((result) => {
       const commentsArray = result.rows;
-      return commentsArray;
+      return commentsArray; // returns resulting comments in an array.
     });
 };
