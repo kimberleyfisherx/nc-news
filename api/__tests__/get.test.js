@@ -56,4 +56,42 @@ describe("GET /api/topics", () => {
         });
     });
   });
+  describe("/api/articles/:article_id", () => {
+    test("returns an article object with expected properties", () => {
+      return request(app)
+        .get("/api/articles/4")
+        .expect(200)
+        .then((response) => {
+          const article = response.body.article;
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+          expect(article.article_id).toBe(4);
+        });
+    });
+  });
+
+  test("to GET a status 400 and correct error message when an invalid article id is selected", () => {
+    return request(app)
+      .get("/api/articles/invalid")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("invalid request");
+      });
+  });
+  test("to GET a status 404 and correct error message when an  article id is valid but does not exist", () => {
+    return request(app)
+      .get("/api/articles/999999")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toEqual("Article not found");
+      });
+  });
 });

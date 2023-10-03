@@ -1,4 +1,4 @@
-const { getTopics, getApi } = require("../models/models.api"); //imports gettopics which selects topics
+const { getTopics, getApi, getArticleId } = require("../models/models.api"); //imports gettopics which selects topics
 
 exports.fetchTopics = (req, res) => {
   //exports fetchtopics function , funtion takes 2 params request and response
@@ -19,4 +19,13 @@ exports.fetchApi = (req, res) => {
   getApi().then((result) => {
     res.status(200).send({ endPointData: result }); // then sends this infor back to the client as a JSON response.
   });
+};
+
+exports.fetchArticleId = (req, res, next) => {
+  const articleIdQuery = req.params;
+  getArticleId(articleIdQuery)
+    .then((result) => {
+      res.status(200).send({ article: result });
+    })
+    .catch(next);
 };
