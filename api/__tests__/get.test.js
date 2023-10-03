@@ -57,21 +57,23 @@ describe("GET /api/topics", () => {
     });
   });
   describe("/api/articles/:article_id", () => {
-    test("to GET an article object containing the following properties: author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
+    test("returns an article object with expected properties", () => {
       return request(app)
         .get("/api/articles/4")
         .expect(200)
         .then((response) => {
-          const articleObject = response.body.article;
-          expect(articleObject.hasOwnProperty("author")).toBe(true);
-          expect(articleObject.hasOwnProperty("title")).toBe(true);
-          expect(articleObject.hasOwnProperty("article_id")).toBe(true);
-          expect(articleObject.hasOwnProperty("body")).toBe(true);
-          expect(articleObject.hasOwnProperty("topic")).toBe(true);
-          expect(articleObject.hasOwnProperty("created_at")).toBe(true);
-          expect(articleObject.hasOwnProperty("votes")).toBe(true);
-          expect(articleObject.hasOwnProperty("article_img_url")).toBe(true);
-          expect(articleObject.article_id).toBe(4);
+          const article = response.body.article;
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+          expect(article.article_id).toBe(4);
         });
     });
   });
