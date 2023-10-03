@@ -1,4 +1,9 @@
-const { getTopics, getApi, getArticleId } = require("../models/models.api"); //imports gettopics which selects topics
+const {
+  getTopics,
+  getApi,
+  getArticleId,
+  getArticlesInDateOrder,
+} = require("../models/models.api"); //imports gettopics which selects topics
 
 exports.fetchTopics = (req, res) => {
   //exports fetchtopics function , funtion takes 2 params request and response
@@ -28,4 +33,10 @@ exports.fetchArticleId = (req, res, next) => {
       res.status(200).send({ article: result });
     })
     .catch(next);
+};
+
+exports.fetchArticles = (req, res) => {
+  getArticlesInDateOrder().then((result) => {
+    res.status(200).send({ articles: result });
+  });
 };

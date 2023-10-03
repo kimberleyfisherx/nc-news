@@ -3,7 +3,7 @@ const seed = require("../../db/seeds/seed"); //imports seeding
 const request = require("supertest"); //imports supertest (a library which allows http express requests)
 const data = require("../../db/data/test-data/index"); //imports test data
 const app = require("../app"); //imports app has all the application and routes in
-
+const toBeSortedBy = require("jest-sorted");
 beforeEach(() => seed(data)); // sets up function to define what happens before each test, here we populate the database with data before testing
 afterAll(() => db.end()); //used to close connection after each test
 
@@ -92,6 +92,52 @@ describe("GET /api/topics", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toEqual("Article not found");
+      });
+  });
+
+  describe("/api/articles", () => {
+    test(`to GET status 200 and an array containing article objects containing the following properties: author, title, article_id, body, topic, created_at, votes, article_img_url, comment_count. The articles should be sorted by date in descending order.`, () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const articles = response.body.articles;
+
+          const expectedProperties = {
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          };
+
+          expect(articles.length).toBeGreaterThan(0); // Added assertion for array length
+
+          articles.forEach((article) => {
+            expect(article).toMatchObject(expectedProperties);
+
+            expect(article).not.toHaveProperty("body");
+          });
+        });
+    });
+  });
+
+  test("GET articles sorted by date descending", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        const dates = body.articles.map(
+          (article) => new Date(article.created_at)
+        );
+
+        const sortedDates = [...dates].sort((a, b) => b - a);
+
+        expect(dates).toEqual(sortedDates);
       });
   });
 });

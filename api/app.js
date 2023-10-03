@@ -3,6 +3,7 @@ const {
   fetchTopics,
   fetchApi,
   fetchArticleId,
+  fetchArticles,
 } = require("./controllers/controller.api"); //imports fetch function from controllers
 
 const app = express(); // initialise express (object to handle middleware and http)
@@ -13,6 +14,8 @@ app.get("/api/topics", fetchTopics); // defines a GET route, When a GET request 
 app.get("/api/", fetchApi);
 
 app.get("/api/articles/:article_id", fetchArticleId);
+
+app.get("/api/articles", fetchArticles);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Request not found" });
