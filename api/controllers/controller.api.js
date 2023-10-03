@@ -4,12 +4,13 @@ const {
   getArticleId,
   getArticlesInDateOrder,
   getCommentsById,
-} = require("../models/models.api"); 
+  postComment,
+} = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
   getTopics()
     .then((result) => {
-      res.status(200).send({ topics: result }); 
+      res.status(200).send({ topics: result });
     })
     .catch((error) => {
       console.log(error);
@@ -19,7 +20,7 @@ exports.fetchTopics = (req, res) => {
 
 exports.fetchApi = (req, res) => {
   getApi().then((result) => {
-    res.status(200).send({ endPointData: result }); 
+    res.status(200).send({ endPointData: result });
   });
 };
 
@@ -48,6 +49,16 @@ exports.fetchCommentsById = (req, res, next) => {
   getCommentsById(articleIdQuery)
     .then((result) => {
       res.status(200).send({ comments: result });
+    })
+    .catch(next);
+};
+
+exports.sendComment = (req, res, next) => {
+  const articleId = req.params;
+  const comment = req.body;
+  postComment(articleId, comment)
+    .then((result) => {
+      res.status(201).send({ comment: result });
     })
     .catch(next);
 };

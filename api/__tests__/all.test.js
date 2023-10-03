@@ -180,3 +180,30 @@ test("comments sorted by most recent first", () => {
       });
     });
 });
+describe("POST /api/articles/:article_id/comments", () => {
+  test(" GET - STATUS:201 - to POST an object containing a username and body and return with a posted comment", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({ username: "lurker", body: "weird article" })
+      .expect(201)
+      .then((response) => {
+        const commentObject = response.body.comment;
+
+        const expectedCommentObject = {
+          author: "lurker",
+          body: "weird article",
+        };
+
+        expect(commentObject).toMatchObject(expectedCommentObject);
+      });
+  });
+  test("if client tries to comment an empty message Responds with please enter a comment ", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({})
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Please enter a comment");
+      });
+  });
+});
