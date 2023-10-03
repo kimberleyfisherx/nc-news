@@ -28,6 +28,9 @@ exports.getArticleId = (id) => {
       return article;
     });
 };
+
+exports.getArticleByIdQuery = `SELECT * FROM articles WHERE article_id = $1;`;
+
 exports.getArticlesInDateOrder = () => {
   const getArticlesInDateOrderQuery = `
     SELECT articles.article_id, articles.title, articles.topic, articles.author, 
@@ -43,4 +46,21 @@ exports.getArticlesInDateOrder = () => {
     const articlesInDateOrder = result.rows;
     return articlesInDateOrder;
   });
+};
+
+exports.getCommentsByIdQuery = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`;
+
+exports.getCommentsById = (id) => {
+  const articleIdNum = id.article_id;
+  return db
+    .query(exports.getArticleByIdQuery, [articleIdNum])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "no article found" });
+      } else return db.query(exports.getCommentsByIdQuery, [articleIdNum]);
+    })
+    .then((result) => {
+      const commentsArray = result.rows;
+      return commentsArray;
+    });
 };
