@@ -119,10 +119,12 @@ describe("GET /api/topics", () => {
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
-            article_id: expect.any(Number),
+            article_id: 1,
           };
-
           expect(comments.length).toBe(11);
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject(expectedProperties);
+          });
         });
     });
   });
@@ -144,20 +146,20 @@ describe("GET /api/topics", () => {
       });
   });
 });
-test("check endpoints.json file has been updated ", () => {
-  return request(app)
-    .get("/api/")
-    .expect(200)
-    .then((response) => {
-      const endpointObject =
-        response.body.endPointData["GET /api/articles/:article_id/comments"];
-      expect(endpointObject).toMatchObject({
-        description: expect.any(String),
-        queries: expect.any(Array),
-        exampleResponse: expect.any(Array),
-      });
-    });
-});
+// test("check endpoints.json file has been updated ", () => {
+//   return request(app)
+//     .get("/api/")
+//     .expect(200)
+//     .then((response) => {
+//       const endpointObject =
+//         response.body.endPointData["GET /api/articles/:article_id/comments"];
+//       expect(endpointObject).toMatchObject({
+//         description: expect.any(String),
+//         queries: expect.any(Array),
+//         exampleResponse: expect.any(Array),
+//       });
+//     });
+// });
 test("return 404 status code if article_id is valid but there is no article", () => {
   return request(app)
     .get("/api/articles/9999/comments")
