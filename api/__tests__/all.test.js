@@ -146,20 +146,6 @@ describe("GET /api/topics", () => {
       });
   });
 });
-// test("check endpoints.json file has been updated ", () => {
-//   return request(app)
-//     .get("/api/")
-//     .expect(200)
-//     .then((response) => {
-//       const endpointObject =
-//         response.body.endPointData["GET /api/articles/:article_id/comments"];
-//       expect(endpointObject).toMatchObject({
-//         description: expect.any(String),
-//         queries: expect.any(Array),
-//         exampleResponse: expect.any(Array),
-//       });
-//     });
-// });
 test("return 404 status code if article_id is valid but there is no article", () => {
   return request(app)
     .get("/api/articles/9999/comments")
@@ -223,15 +209,42 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(response.body.msg).toEqual("Please enter a comment");
       });
   });
-  describe("POST /api/articles/:article_id/comments", () => {
-    test("if client does not provide username, responds with 400 and error message", () => {
-      return request(app)
-        .post("/api/articles/4/comments")
-        .send({ body: "i'm trying to comment without a username" }) // Missing username just body
-        .expect(400)
-        .then((response) => {
-          expect(response.body.msg).toEqual("Please insert your username");
-        });
-    });
+  test("if client does not provide username, responds with 400 and error message", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({ body: "i'm trying to comment without a username" }) // Missing username just body
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Username not found");
+      });
+  });
+  test("Extra properties in post object are ignored", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
+        username: "lurker",
+        body: "weird article",
+        extraProp: "extraValue",
+      })
+      .expect(201)
+      .then((response) => {
+        const commentObject = response.body.comment;
+        const expectedCommentObject = {
+          author: "lurker",
+          body: "weird article",
+        };
+
+        expect(commentObject).toMatchObject(expectedCommentObject);
+        expect(commentObject).not.toHaveProperty("extraProp");
+      });
+  });
+  test("if username not found in the database return correct error", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({ username: "unknownUser", body: "good article" })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Username not found");
+      });
   });
 });
