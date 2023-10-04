@@ -100,3 +100,21 @@ exports.postComment = (id, comment) => {
         });
     });
 };
+exports.patchVotes = (id, votes) => {
+  const articleIdNum = id.article_id;
+  const votesNum = votes.inc_votes;
+  if (votesNum === undefined || votesNum === null) {
+    return Promise.reject({ status: 400, msg: "please enter your vote" });
+  }
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 returning *;`,
+      [votesNum, articleIdNum]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found" });
+      }
+      return result.rows[0];
+    });
+};
