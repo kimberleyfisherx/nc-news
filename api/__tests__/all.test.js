@@ -209,7 +209,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(response.body.msg).toEqual("Please enter a comment");
       });
   });
-  test("if client does not provide username, responds with 400 and error message", () => {
+  test("if client does not provide username, responds with 404 and error message", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send({ body: "i'm trying to comment without a username" }) // Missing username just body
