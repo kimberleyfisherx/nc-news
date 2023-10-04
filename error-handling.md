@@ -52,7 +52,9 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 
 ### POST `/api/articles/:article_id/comments`
 
-- ???
+    - article doesnt exist
+    -comment empty or white space
+    - not username entered
 
 ### GET `/api/articles/:article_id/comments`
 
