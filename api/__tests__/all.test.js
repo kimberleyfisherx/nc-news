@@ -255,14 +255,28 @@ describe("POST /api/articles/:article_id/comments", () => {
 
 //PATCH TESTS
 describe("PATCH /api/articles/:article_id", () => {
-  test("patch a article using the article_id, return an object with the key of inc_votes and the value of how many votes to be increased or decreased by then returning updated article", () => {
+  test("should return the updated article with all properties and increment vote", () => {
     return request(app)
-      .patch("/api/articles/4")
-      .send({ inc_votes: 7 })
+      .patch("/api/articles/1")
+      .send({ inc_votes: 100 })
       .expect(200)
       .then((response) => {
         const updatedArticle = response.body.article;
-        expect(updatedArticle.votes).toBe(7);
+
+        const expectedArticle = {
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 200,
+          article_img_url: expect.any(String),
+        };
+
+        expect(updatedArticle).toEqual(
+          expect.objectContaining(expectedArticle)
+        );
       });
   });
   test("should decrease the votes of an article", () => {
@@ -275,30 +289,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(updatedArticle.votes).toBe(95);
       });
   });
-  test("should return the updated article with all properties", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: -5 })
-      .expect(200)
-      .then((response) => {
-        const updatedArticle = response.body.article;
 
-        const expectedArticle = {
-          article_id: expect.any(Number),
-          title: expect.any(String),
-          topic: expect.any(String),
-          author: expect.any(String),
-          body: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
-        };
-
-        expect(updatedArticle).toEqual(
-          expect.objectContaining(expectedArticle)
-        );
-      });
-  });
   test(" Responds with correct error message when an article id is valid but doesnt exist when patching votes", () => {
     return request(app)
       .patch("/api/articles/9999")
@@ -323,7 +314,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: "ten votes" })
       .expect(400)
       .then((response) => {
-        expect(response.body.msg).toEqual("votes must be a number");
+        expect(response.body.msg).toEqual("invalid request");
       });
   });
   test("Responds with correct error message when votes is empty", () => {
@@ -332,7 +323,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({})
       .expect(400)
       .then((response) => {
-        expect(response.body.msg).toEqual("votes must be a number");
+        expect(response.body.msg).toEqual("please enter your vote");
       });
   });
 });

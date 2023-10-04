@@ -100,15 +100,12 @@ exports.postComment = (id, comment) => {
         });
     });
 };
-
 exports.patchVotes = (id, votes) => {
   const articleIdNum = id.article_id;
   const votesNum = votes.inc_votes;
-
-   if (typeof votesNum !== 'number' || isNaN(votesNum)) {
-        return Promise.reject({ status: 400, msg: "votes must be a number" });
-    }
-
+  if (votesNum === undefined || votesNum === null) {
+    return Promise.reject({ status: 400, msg: "please enter your vote" });
+  }
   return db
     .query(
       `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 returning *;`,
