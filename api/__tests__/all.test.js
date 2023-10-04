@@ -166,8 +166,11 @@ test("comments sorted by most recent first", () => {
       });
     });
 });
+
+// POST TESTS
+
 describe("POST /api/articles/:article_id/comments", () => {
-  test(" GET - STATUS:201 - to POST an object containing a username and body and return with a posted comment", () => {
+  test(" to POST an object containing a username and body and return with a posted comment", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send({ username: "lurker", body: "weird article" })
@@ -180,6 +183,26 @@ describe("POST /api/articles/:article_id/comments", () => {
         };
 
         expect(commentObject).toMatchObject(expectedCommentObject);
+      });
+  });
+  test("Extra properties in post object are ignored", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
+        username: "lurker",
+        body: "weird article",
+        extraProp: "extraValue",
+      })
+      .expect(201)
+      .then((response) => {
+        const commentObject = response.body.comment;
+        const expectedCommentObject = {
+          author: "lurker",
+          body: "weird article",
+        };
+
+        expect(commentObject).toMatchObject(expectedCommentObject);
+        expect(commentObject).not.toHaveProperty("extraProp");
       });
   });
   test("if client tries to comment an empty message Responds with please enter a comment ", () => {
@@ -218,26 +241,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(response.body.msg).toEqual("Username not found");
       });
   });
-  test("Extra properties in post object are ignored", () => {
-    return request(app)
-      .post("/api/articles/4/comments")
-      .send({
-        username: "lurker",
-        body: "weird article",
-        extraProp: "extraValue",
-      })
-      .expect(201)
-      .then((response) => {
-        const commentObject = response.body.comment;
-        const expectedCommentObject = {
-          author: "lurker",
-          body: "weird article",
-        };
 
-        expect(commentObject).toMatchObject(expectedCommentObject);
-        expect(commentObject).not.toHaveProperty("extraProp");
-      });
-  });
   test("if username not found in the database return correct error", () => {
     return request(app)
       .post("/api/articles/4/comments")
@@ -245,6 +249,90 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toEqual("Username not found");
+      });
+  });
+});
+
+//PATCH TESTS
+describe("PATCH /api/articles/:article_id", () => {
+  test("patch a article using the article_id, return an object with the key of inc_votes and the value of how many votes to be increased or decreased by then returning updated article", () => {
+    return request(app)
+      .patch("/api/articles/4")
+      .send({ inc_votes: 7 })
+      .expect(200)
+      .then((response) => {
+        const updatedArticle = response.body.article;
+        expect(updatedArticle.votes).toBe(7);
+      });
+  });
+  test("should decrease the votes of an article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -5 })
+      .expect(200)
+      .then((response) => {
+        const updatedArticle = response.body.article;
+        expect(updatedArticle.votes).toBe(95);
+      });
+  });
+  test("should return the updated article with all properties", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -5 })
+      .expect(200)
+      .then((response) => {
+        const updatedArticle = response.body.article;
+
+        const expectedArticle = {
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        };
+
+        expect(updatedArticle).toEqual(
+          expect.objectContaining(expectedArticle)
+        );
+      });
+  });
+  test(" Responds with correct error message when an article id is valid but doesnt exist when patching votes", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 10 })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Article not found");
+      });
+  });
+  test(" Responds with correct error message if the artcle id is invalid", () => {
+    return request(app)
+      .patch("/api/articles/invalid")
+      .send({ inc_votes: 10 })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("invalid request");
+      });
+  });
+  test("Responds with correct error message when votes is not a number", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "ten votes" })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("votes must be a number");
+      });
+  });
+  test("Responds with correct error message when votes is empty", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("votes must be a number");
       });
   });
 });

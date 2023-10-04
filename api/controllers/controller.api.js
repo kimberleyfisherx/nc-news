@@ -5,6 +5,7 @@ const {
   getArticlesInDateOrder,
   getCommentsById,
   postComment,
+  patchVotes,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
@@ -59,6 +60,16 @@ exports.sendComment = (req, res, next) => {
   postComment(articleId, comment)
     .then((result) => {
       res.status(201).send({ comment: result });
+    })
+    .catch(next);
+};
+
+exports.updateVotes = (req, res, next) => {
+  const articleId = req.params;
+  const votesObj = req.body;
+  patchVotes(articleId, votesObj)
+    .then((result) => {
+      res.status(200).send({ article: result });
     })
     .catch(next);
 };

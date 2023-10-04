@@ -6,6 +6,7 @@ const {
   fetchArticles,
   fetchCommentsById,
   sendComment,
+  updateVotes,
 } = require("./controllers/controller.api"); //imports fetch function from controllers
 
 const app = express(); // initialise express (object to handle middleware and http)
@@ -22,6 +23,8 @@ app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id/comments", fetchCommentsById);
 
 app.post("/api/articles/:article_id/comments", sendComment);
+
+app.patch("/api/articles/:article_id", updateVotes);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Request not found" });
