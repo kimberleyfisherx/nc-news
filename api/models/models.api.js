@@ -73,27 +73,27 @@ exports.postComment = (id, comment) => {
   const commentAuthor = comment.username;
 
   if (!commentBody || commentBody.trim() === "") {
-    return Promise.reject({ status: 400, msg: "Please enter a comment" });
+    return Promise.reject({ status: 400, msg: "Please enter a comment" }); // this looks for an empty comment or comment with only a space
   }
 
   if (!commentAuthor) {
-    return Promise.reject({ status: 400, msg: "Please insert your username" });
+    return Promise.reject({ status: 400, msg: "Please insert your username" }); // this looks for whether they have enterned their username
   }
 
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [articleIdNum])
     .then((result) => {
       if (result.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Article not found" });
+        return Promise.reject({ status: 404, msg: "Article not found" }); // this looks for if the article actually exists if it doesnt returns error, if it does move on
       }
       return db
         .query(
           "INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *",
-          [commentBody, commentAuthor, articleIdNum]
+          [commentBody, commentAuthor, articleIdNum] // this inserts the comment
         )
         .then((result) => {
           const commentObj = result.rows[0];
-          return commentObj;
+          return commentObj; // this returns the comment
         });
     });
 };
