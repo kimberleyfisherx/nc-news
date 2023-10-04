@@ -6,6 +6,7 @@ const {
   getCommentsById,
   postComment,
   patchVotes,
+  deleteComment,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
@@ -70,6 +71,15 @@ exports.updateVotes = (req, res, next) => {
   patchVotes(articleId, votesObj)
     .then((result) => {
       res.status(200).send({ article: result });
+    })
+    .catch(next);
+};
+
+exports.deleteCommentById = (req, res, next) => {
+  const commentId = req.params;
+  deleteComment(commentId)
+    .then((result) => {
+      res.status(204).send({ commentDeleted: result });
     })
     .catch(next);
 };
