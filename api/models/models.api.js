@@ -66,3 +66,37 @@ exports.getCommentsById = (id) => {
       return commentsArray; // returns resulting comments in an array.
     });
 };
+
+exports.postComment = (id, comment) => {
+  const articleIdNum = id.article_id;
+  const commentBody = comment.body;
+  const commentAuthor = comment.username;
+
+  if (!commentBody || commentBody.trim() === "") {
+    return Promise.reject({ status: 400, msg: "Please enter a comment" }); // this looks for an empty comment or comment with only a space
+  }
+
+  return db
+    .query("SELECT * FROM articles WHERE article_id = $1", [articleIdNum])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Article not found" }); // this looks for if the article actually exists if it doesnt returns error, if it does move on
+      }
+      return db
+        .query("SELECT * FROM users WHERE username = $1", [commentAuthor])
+        .then((userResult) => {
+          if (userResult.rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "Username not found" });
+          }
+          return db
+            .query(
+              "INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *",
+              [commentBody, commentAuthor, articleIdNum] // this inserts the comment
+            )
+            .then((result) => {
+              const commentObj = result.rows[0];
+              return commentObj; // this returns the comment
+            });
+        });
+    });
+};
