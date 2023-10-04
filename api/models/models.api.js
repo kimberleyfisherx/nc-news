@@ -71,9 +71,15 @@ exports.postComment = (id, comment) => {
   const articleIdNum = id.article_id;
   const commentBody = comment.body;
   const commentAuthor = comment.username;
+
   if (!commentBody || commentBody.trim() === "") {
     return Promise.reject({ status: 400, msg: "Please enter a comment" });
   }
+
+  if (!commentAuthor) {
+    return Promise.reject({ status: 400, msg: "Please insert your username" });
+  }
+
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [articleIdNum])
     .then((result) => {

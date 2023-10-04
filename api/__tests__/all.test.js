@@ -188,7 +188,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(201)
       .then((response) => {
         const commentObject = response.body.comment;
-
         const expectedCommentObject = {
           author: "lurker",
           body: "weird article",
@@ -205,5 +204,34 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then((response) => {
         expect(response.body.msg).toEqual("Please enter a comment");
       });
+  });
+  test("if provided article ID does not exist, responds with 404 and error message", () => {
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send({ username: "lurker", body: "weird article" })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Article not found");
+      });
+  });
+  test("if comment only contains white space returns correct error message", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({ username: "lurker", body: " " }) //comment is just a space
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Please enter a comment");
+      });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("if client does not provide username, responds with 400 and error message", () => {
+      return request(app)
+        .post("/api/articles/4/comments")
+        .send({ body: "i'm trying to comment without a username" }) // Missing username just body
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toEqual("Please insert your username");
+        });
+    });
   });
 });

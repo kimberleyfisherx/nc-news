@@ -66,12 +66,12 @@
     "description":"serves up a comment what has been added to the article",
     "queries":["article_id"],
     "exampleResponse": {
-      "comment_id":7,
-      "body": "Lobster pot",
-      "article_id": 1,
-      "author": "icellusedkars",
-      "votes": 0,
-      "created_at": "1589577540000"
+      "comment_id": 19,
+        "body": "weird article",
+        "article_id": 4,
+        "author": "lurker",
+        "votes": 0,
+        "created_at": "2023-10-04T07:38:38.866Z"
     }
 }
 }
