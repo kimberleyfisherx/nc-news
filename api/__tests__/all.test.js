@@ -189,6 +189,52 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe("GET /api/articles with topic query", () => {
+  test("should return an array of articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .then((response) => {
+        expect(response.status).toBe(200);
+
+        const articles = response.body.articles;
+
+        expect(articles.length).toBe(1);
+
+        articles.forEach((article) => {
+          const expectedShape = {
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: "cats",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          };
+
+          expect(article).toMatchObject(expectedShape);
+        });
+      });
+  });
+  test("should return an empty array for a valid topic with no articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .then((response) => {
+        expect(response.status).toBe(200);
+
+        const articles = response.body.articles;
+
+        expect(articles).toHaveLength(0);
+      });
+  });
+  test("should return an error message for invalid topic", () => {
+    return request(app)
+      .get("/api/articles?topic=invalid")
+      .then((response) => {
+        expect(response.status).toBe(200);
+      });
+  });
+});
 
 // POST TESTS
 
