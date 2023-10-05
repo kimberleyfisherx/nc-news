@@ -78,8 +78,8 @@ exports.updateVotes = (req, res, next) => {
 exports.deleteCommentById = (req, res, next) => {
   const commentId = req.params;
   deleteComment(commentId)
-    .then((result) => {
-      res.status(204).send({ commentDeleted: result });
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
