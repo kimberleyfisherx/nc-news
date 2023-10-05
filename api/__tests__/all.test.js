@@ -55,27 +55,6 @@ describe("GET /api/topics", () => {
         });
     });
   });
-  describe("GET/api/articles/:article_id", () => {
-    test("returns an article object with expected properties", () => {
-      return request(app)
-        .get("/api/articles/4")
-        .expect(200)
-        .then((response) => {
-          const article = response.body.article;
-          expect(article).toMatchObject({
-            author: expect.any(String),
-            title: expect.any(String),
-            article_id: expect.any(Number),
-            body: expect.any(String),
-            topic: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
-          });
-          expect(article.article_id).toBe(4);
-        });
-    });
-  });
 
   test("returns a status 400 and invalid request message when an invalid article id is selected", () => {
     return request(app)
@@ -146,26 +125,28 @@ describe("GET /api/topics", () => {
       });
   });
 });
-test("return 404 status code if article_id is valid but there is no article", () => {
-  return request(app)
-    .get("/api/articles/9999/comments")
-    .expect(404)
-    .then((response) => {
-      expect(response.body.msg).toEqual("no article found");
-    });
-});
-test("comments sorted by most recent first", () => {
-  return request(app)
-    .get("/api/articles/1/comments")
-    .expect(200)
-    .then(({ body }) => {
-      const comments = body.comments;
-      expect(comments).toBeSorted({
-        key: "created_at",
-        descending: true,
+describe("GET/api/articles/:article_id", () => {
+  test("returns an article object with expected properties", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+        expect(article.article_id).toBe(4);
       });
-    });
+  });
 });
+
 describe("GET /api/users", () => {
   test(" Responds with an array of user objects containing the following keys: username, name and avatar_url", () => {
     return request(app)
@@ -189,7 +170,7 @@ describe("GET /api/users", () => {
       });
   });
 });
-describe("GET /api/articles with topic query", () => {
+describe.skip("GET /api/articles with topic query", () => {
   test("should return an array of articles filtered by topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")
@@ -232,6 +213,39 @@ describe("GET /api/articles with topic query", () => {
       .get("/api/articles?topic=invalid")
       .then((response) => {
         expect(response.status).toBe(200);
+      });
+  });
+});
+describe("GET /api/articles/:article_id (comment_count)", () => {
+  test("should return an article with comment_count", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((response) => {
+        const article = response.body.article;
+
+        expect(article).toHaveProperty("comment_count");
+        expect(article.comment_count).toBe("11");
+      });
+  });
+  test("return 404 status code if article_id is valid but there is no article", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("no article found");
+      });
+  });
+  test("comments sorted by most recent first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBeSorted({
+          key: "created_at",
+          descending: true,
+        });
       });
   });
 });

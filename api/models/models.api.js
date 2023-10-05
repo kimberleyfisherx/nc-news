@@ -20,7 +20,10 @@ exports.getApi = () => {
 exports.getArticleId = (id) => {
   const articleIdNum = id.article_id;
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1;`, [articleIdNum])
+    .query(
+      `SELECT articles.author,articles.title,articles.article_id, articles.topic, articles.created_at, articles.votes,articles.article_img_url, articles.body , COUNT(comments) as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id  WHERE articles.article_id = $1 GROUP BY articles.article_id ;`,
+      [articleIdNum]
+    )
     .then((result) => {
       const article = result.rows[0];
       if (!article) {
@@ -54,13 +57,11 @@ exports.getCommentsByIdQuery = `SELECT * FROM comments WHERE article_id = $1 ORD
 exports.getCommentsById = (id) => {
   const articleIdNum = id.article_id;
   return db
-    .query(exports.getArticleByIdQuery, [articleIdNum]) //Query to get article information based on articleIdNum.
+    .query(exports.getArticleByIdQuery, [articleIdNum])
     .then((result) => {
-      // Handle the result of the first query.
       if (result.rows.length === 0) {
-        // Check if there are no rows returned.
-        return Promise.reject({ status: 404, msg: "no article found" }); // If no rows, reject the promise with a 404 status and an error message.
-      } else return db.query(exports.getCommentsByIdQuery, [articleIdNum]); // If there are rows, query for comments based on articleIdNum.
+        return Promise.reject({ status: 404, msg: "no article found" });
+      } else return db.query(exports.getCommentsByIdQuery, [articleIdNum]);
     })
     .then((result) => {
       const commentsArray = result.rows;
@@ -169,6 +170,14 @@ exports.selectAllArticles = (topics) => {
   `;
 
   return db.query(query, values).then((articles) => {
-    return articles.rows;
+    const article = articles.rows;
+    if (article.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: "Article does not exist!",
+      });
+    } else {
+      return article;
+    }
   });
 };

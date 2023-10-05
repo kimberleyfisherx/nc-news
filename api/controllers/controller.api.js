@@ -8,7 +8,6 @@ const {
   patchVotes,
   deleteComment,
   getUsers,
-  selectAllArticles,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
@@ -29,12 +28,23 @@ exports.fetchApi = (req, res) => {
 };
 
 exports.fetchArticleId = (req, res, next) => {
-  const articleIdQuery = req.params;
-  getArticleId(articleIdQuery)
+  const articleId = req.params;
+  getArticleId(articleId)
     .then((result) => {
       res.status(200).send({ article: result });
     })
     .catch(next);
+};
+
+exports.fetchArticles = (req, res, next) => {
+  getArticlesInDateOrder()
+    .then((result) => {
+      res.status(200).send({ articles: result });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ error: "Error fetching articles" });
+    });
 };
 
 exports.fetchCommentsById = (req, res, next) => {
@@ -79,16 +89,6 @@ exports.fetchUsers = (req, res, next) => {
   getUsers()
     .then((result) => {
       res.status(200).send({ users: result });
-    })
-    .catch(next);
-};
-
-exports.getArticles = (req, res, next) => {
-  const { topic } = req.query;
-
-  selectAllArticles(topic)
-    .then((articles) => {
-      res.status(200).send({ articles });
     })
     .catch(next);
 };
