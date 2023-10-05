@@ -1,5 +1,6 @@
 const db = require("../../db/connection"); //imports db from connection
 const fs = require("fs/promises");
+const { fetchTopics } = require("../controllers/controller.api");
 
 exports.getTopics = () => {
   //exports get topics function
@@ -137,4 +138,36 @@ exports.getUsers = () => {
   return db.query(`SELECT * FROM users;`).then((result) => {
     return result.rows;
   });
+};
+
+exports.selectAllArticles = (topics) => {
+  console.log(topics);
+  const values = [];
+  let conditionalWhere = "";
+  if (topics) {
+    conditionalWhere = "WHERE articles.topic = $1";
+    values.push(topics);
+  }
+  let query = `
+    SELECT 
+      articles.author, 
+      articles.title, 
+      articles.article_id, 
+      articles.topic, 
+      articles.created_at, 
+      articles.votes, 
+      articles.article_img_url, 
+      COUNT(comments) as comment_count
+    FROM 
+      articles
+    LEFT JOIN 
+      comments ON articles.article_id = comments.article_id
+    ${conditionalWhere}
+    GROUP BY 
+      articles.article_id
+    ORDER BY 
+      articles.created_at DESC;
+  `;
+
+  return db.query(query, values).then((articles) => articles.rows);
 };

@@ -189,6 +189,43 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe("GET /api/articles with topic query", () => {
+  test("should return an array of articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .then((response) => {
+        expect(response.status).toBe(200);
+
+        const articles = response.body.articles;
+
+        articles.forEach((article) => {
+          const expectedShape = {
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: "cats",
+            created_at: expect.any(String), // Adjust this if it's a different data type
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          };
+
+          expect(article).toMatchObject(expectedShape);
+        });
+      });
+  });
+  test("should return an empty array for invalid topic", () => {
+    return request(app)
+      .get("/api/articles?topic=invalid")
+      .then((response) => {
+        expect(response.status).toBe(200);
+
+        const articles = response.body.articles;
+
+        expect(articles).toHaveLength(0);
+      });
+  });
+});
 
 // POST TESTS
 

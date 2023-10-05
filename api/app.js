@@ -9,7 +9,9 @@ const {
   updateVotes,
   deleteCommentById,
   fetchUsers,
+  getArticles,
 } = require("./controllers/controller.api"); //imports fetch function from controllers
+const { fetchArticlesByTopic } = require("./models/models.api");
 
 const app = express(); // initialise express (object to handle middleware and http)
 app.use(express.json()); // app.use handles specific requests - here we are parse that data and making it available in the req.body to use later
@@ -20,11 +22,13 @@ app.get("/api/", fetchApi);
 
 app.get("/api/articles/:article_id", fetchArticleId);
 
-app.get("/api/articles", fetchArticles);
+
 
 app.get("/api/articles/:article_id/comments", fetchCommentsById);
 
 app.get("/api/users", fetchUsers);
+
+app.get("/api/articles", getArticles);
 
 app.post("/api/articles/:article_id/comments", sendComment);
 
