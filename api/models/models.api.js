@@ -141,7 +141,6 @@ exports.getUsers = () => {
 };
 
 exports.selectAllArticles = (topics) => {
-  console.log(topics);
   const values = [];
   let conditionalWhere = "";
   if (topics) {
@@ -169,5 +168,7 @@ exports.selectAllArticles = (topics) => {
       articles.created_at DESC;
   `;
 
-  return db.query(query, values).then((articles) => articles.rows);
+  return db.query(query, values).then((articles) => {
+    return articles.rows;
+  });
 };
