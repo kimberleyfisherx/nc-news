@@ -327,3 +327,35 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+//  DELETE TESTS
+
+describe("DElETE /api/comments/:comment_id", () => {
+  test("to delete a specific comment using the comment_id", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+});
+test('should return "request not found" when trying to access a deleted comment', () => {
+  return request(app)
+    .get("/api/comments/1")
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe("Request not found");
+    });
+});
+test("when comment_id is valid but comment does not exist return correct error", () => {
+  return request(app)
+    .delete("/api/comments/9999")
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toEqual("Comment not found");
+    });
+});
+test("when comment_id is invalid return correct error", () => {
+  return request(app)
+    .delete("/api/comments/invalid")
+    .expect(400)
+    .then((response) => {
+      expect(response.body.msg).toEqual("invalid request");
+    });
+});
