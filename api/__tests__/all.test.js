@@ -166,6 +166,29 @@ test("comments sorted by most recent first", () => {
       });
     });
 });
+describe("GET /api/users", () => {
+  test(" Responds with an array of user objects containing the following keys: username, name and avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.users.length).toBe(4);
+        expect(response.body.users[0]).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String),
+        });
+      });
+  });
+  test(" Responds with correct error message when the user puts an invalid end point", () => {
+    return request(app)
+      .get("/api/users/invalid")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toEqual("Request not found");
+      });
+  });
+});
 
 // POST TESTS
 

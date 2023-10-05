@@ -8,6 +8,7 @@ const {
   sendComment,
   updateVotes,
   deleteCommentById,
+  fetchUsers,
 } = require("./controllers/controller.api"); //imports fetch function from controllers
 
 const app = express(); // initialise express (object to handle middleware and http)
@@ -22,6 +23,8 @@ app.get("/api/articles/:article_id", fetchArticleId);
 app.get("/api/articles", fetchArticles);
 
 app.get("/api/articles/:article_id/comments", fetchCommentsById);
+
+app.get("/api/users", fetchUsers);
 
 app.post("/api/articles/:article_id/comments", sendComment);
 
