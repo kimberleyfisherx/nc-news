@@ -7,6 +7,7 @@ const {
   postComment,
   patchVotes,
   deleteComment,
+  getUsers,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
@@ -80,6 +81,14 @@ exports.deleteCommentById = (req, res, next) => {
   deleteComment(commentId)
     .then(() => {
       res.status(204).send();
+    })
+    .catch(next);
+};
+
+exports.fetchUsers = (req, res, next) => {
+  getUsers()
+    .then((result) => {
+      res.status(200).send({ users: result });
     })
     .catch(next);
 };
