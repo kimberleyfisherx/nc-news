@@ -148,6 +148,7 @@ exports.selectAllArticles = (topics) => {
     conditionalWhere = "WHERE articles.topic = $1";
     values.push(topics);
   }
+
   let query = `
     SELECT 
       articles.author, 
@@ -169,13 +170,12 @@ exports.selectAllArticles = (topics) => {
       articles.created_at DESC;
   `;
 
+  //console.log(query);
+
   return db.query(query, values).then((articles) => {
     const article = articles.rows;
     if (article.length === 0) {
-      return Promise.reject({
-        status: 404,
-        msg: "Article does not exist!",
-      });
+      return [];
     } else {
       return article;
     }

@@ -9,6 +9,7 @@ const {
   updateVotes,
   deleteCommentById,
   fetchUsers,
+  getArticles,
 } = require("./controllers/controller.api"); //imports fetch function from controllers
 
 const app = express(); // initialise express (object to handle middleware and http)
@@ -17,10 +18,17 @@ app.use(express.json()); // app.use handles specific requests - here we are pars
 app.get("/api/topics", fetchTopics); // defines a GET route, When a GET request made ,call the fetchTopics function made in controller file
 
 app.get("/api/", fetchApi);
-
+app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", fetchArticleId);
 
-app.get("/api/articles", fetchArticles);
+/*app.get("/api/articles", (req, res) => {
+  var topic = req.query;
+  if (topic != null) {
+    getArticles(topic.topic);
+  } else {
+    fetchArticles();
+  }
+});*/
 
 app.get("/api/articles/:article_id/comments", fetchCommentsById);
 

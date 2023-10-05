@@ -170,7 +170,7 @@ describe("GET /api/users", () => {
       });
   });
 });
-describe.skip("GET /api/articles with topic query", () => {
+describe("GET /api/articles with topic query", () => {
   test("should return an array of articles filtered by topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")

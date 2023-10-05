@@ -8,6 +8,8 @@ const {
   patchVotes,
   deleteComment,
   getUsers,
+  selectAllArticles,
+  fetchTopics,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
@@ -92,3 +94,21 @@ exports.fetchUsers = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getArticles = (req, res, next) => {
+  const { topic } = req.query;
+
+  selectAllArticles(topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
+};
+
+// exports.fetchTopics = (req, res, next) => {
+//   getTopics()
+//     .then((result) => {
+//       res.status(200).send({ topics: result });
+//     })
+//     .catch(next);
+// };
