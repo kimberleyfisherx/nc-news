@@ -21,15 +21,13 @@ describe("GET /api/topics", () => {
         });
       });
   });
-  describe("GET /api/invalidendpoint", () => {
-    test("should return a 404 status and the error message", () => {
-      return request(app)
-        .get("/api/topics/invalidendpoint")
-        .expect(404)
-        .then((res) => {
-          expect(res.body.msg).toEqual("Request not found");
-        });
-    });
+  test("should return a 404 status and the error message", () => {
+    return request(app)
+      .get("/api/topics/invalidendpoint")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toEqual("Request not found");
+      });
   });
   describe("GET/api", () => {
     test("should return JSON object with endpoint details including description, queries, and example response for each endpoint", () => {

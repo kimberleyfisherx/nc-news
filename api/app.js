@@ -12,7 +12,11 @@ const {
   getArticles,
 } = require("./controllers/controller.api");
 
+const cors = require("cors");
+
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/topics", fetchTopics);
