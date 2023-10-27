@@ -141,12 +141,49 @@ exports.getUsers = () => {
   });
 };
 
-exports.selectAllArticles = (topics) => {
+const validColumns = [
+  "author",
+  "title",
+  "article_id",
+  "topic",
+  "created_at",
+  "votes",
+  "article_img_url",
+];
+
+const isValidColumn = (columnName) => {
+  return validColumns.includes(columnName);
+};
+
+const validOrders = ["asc", "desc"];
+
+const isValidOrder = (order) => {
+  return validOrders.includes(order);
+};
+
+exports.selectAllArticles = (topic, sort_by, order) => {
   const values = [];
   let conditionalWhere = "";
-  if (topics) {
+  if (topic) {
     conditionalWhere = "WHERE articles.topic = $1";
-    values.push(topics);
+    values.push(topic);
+  }
+
+  let orderBy = "ORDER BY articles.created_at DESC";
+
+  if (sort_by && !isValidColumn(sort_by)) {
+    return Promise.reject({ status: 404, msg: "Invalid sort_by query" });
+  }
+
+  if (order && !isValidOrder(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+
+  if (sort_by) {
+    orderBy = `ORDER BY articles.${sort_by}`;
+    if (order) {
+      orderBy += ` ${order}`;
+    }
   }
 
   let query = `
@@ -166,11 +203,8 @@ exports.selectAllArticles = (topics) => {
     ${conditionalWhere}
     GROUP BY 
       articles.article_id
-    ORDER BY 
-      articles.created_at DESC;
+    ${orderBy};
   `;
-
-  //console.log(query);
 
   return db.query(query, values).then((articles) => {
     const article = articles.rows;

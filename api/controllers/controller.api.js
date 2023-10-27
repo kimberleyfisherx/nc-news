@@ -96,19 +96,11 @@ exports.fetchUsers = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { topic } = req.query;
+  const { sort_by, topic, order } = req.query;
 
-  selectAllArticles(topic)
+  selectAllArticles(topic, sort_by, order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
     .catch(next);
 };
-
-// exports.fetchTopics = (req, res, next) => {
-//   getTopics()
-//     .then((result) => {
-//       res.status(200).send({ topics: result });
-//     })
-//     .catch(next);
-// };
