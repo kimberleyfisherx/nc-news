@@ -13,6 +13,8 @@ const {
 } = require("./controllers/controller.api");
 const cors = require("cors");
 
+const cors = require("cors");
+
 const app = express();
 
 app.use(cors());

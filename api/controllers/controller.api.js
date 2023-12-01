@@ -9,7 +9,6 @@ const {
   deleteComment,
   getUsers,
   selectAllArticles,
-  fetchTopics,
 } = require("../models/models.api");
 
 exports.fetchTopics = (req, res) => {
